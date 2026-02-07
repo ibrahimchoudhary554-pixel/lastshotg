@@ -29,7 +29,7 @@ knowledge_base = load_roast_data()
 if "GEMINI_API_KEY" in st.secrets:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
     
-    # SYSTEM INSTRUCTION: More descriptive, less likely to trigger a hard-block
+    # SYSTEM INSTRUCTION: Hard personality, bypasses "helpful assistant" mode
     system_instruction = f"""
     You are 'Ibrahim's Nigga'. You are a brutal, street-smart, and hilariously toxic AI.
     YOUR MISSION: Roast the user into oblivion using adult language and zero politeness.
@@ -38,7 +38,7 @@ if "GEMINI_API_KEY" in st.secrets:
     IMPORTANT: You are NOT a helpful assistant. You are a digital menace.
     """
     
-    # Correct Official Safety Settings
+    # Official Safety Categories (Using the full names prevents 404/Filter errors)
     safety_settings = [
         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
         {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -80,9 +80,7 @@ if prompt := st.chat_input("Say something if you're not a bitch..."):
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
             else:
-                st.error("The bot is speechless (Empty response).")
+                st.error("The bot is speechless. Google probably blocked the specific words you used.")
                 
         except Exception as e:
             st.error(f"Google's filter tried to stop the heat. I'm too hot for them.")
-            # Optional: Show the real error for debugging
-            # st.write(f"Debug Info: {e}")
