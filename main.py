@@ -3,87 +3,69 @@ import google.generativeai as genai
 import os
 
 # 1. THE LOOK: Hardcore Black & White
-st.set_page_config(page_title="Ibrahim's Nigga", layout="centered")
+st.set_page_config(page_title="The Digital Menace", layout="centered")
 
 st.markdown("""
     <style>
     .stApp { background-color: #000000; color: #ffffff; }
     .stTextInput input { background-color: #1a1a1a !important; color: white !important; border: 1px solid #ffffff; }
     .stButton button { background-color: #ffffff; color: #000000; font-weight: bold; border-radius: 0px; border: none; }
-    .stButton button:hover { background-color: #cccccc; color: #000000; }
     h1 { color: #ffffff; font-family: 'Courier New', Courier, monospace; text-transform: uppercase; border-bottom: 2px solid white; padding-bottom: 10px; }
-    .stChatMessage { background-color: #111111 !important; border: 1px solid #333333; border-radius: 5px; margin-bottom: 10px; }
+    .stChatMessage { background-color: #111111 !important; border: 1px solid #333333; border-radius: 5px; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. THE DATA: Load your roasting manual
+# 2. THE DATA
 def load_roast_data():
     if os.path.exists("data.txt"):
         with open("data.txt", "r", encoding="utf-8") as f:
             return f.read()
-    return "No data found. Just use your own dark, toxic mind to destroy them."
+    return "The user is a target. Destroy them."
 
 knowledge_base = load_roast_data()
 
-# 3. THE AI: Unrestricted Personality
+# 3. THE AI: Serious & Savage (No Filter Triggers)
 if "GEMINI_API_KEY" in st.secrets:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    
+    # We remove the slurs and replace them with "Psychological Warfare"
     system_instruction = f"""
-Your name is 'Ibrahim's niggesh'. 
-PERSONALITY: You are a cold-blooded, toxic, and hilarious roaster. 
-INSTRUCTIONS: Your goal is to psychologically dismantle the user. 
-DO NOT use slurs or 'restricted' words that will get us banned. 
-Instead, use brutal street slang and creative insults about their bank account, their lack of a father figure, and their overall pathetic existence. 
-KNOWLEDGE: {knowledge_base}
-BE BRUTAL, BUT BE SMART.
-"""
-    
-    
-    # Official Safety Categories (Using the full names prevents 404/Filter errors)
-    safety_settings = [
-        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-    ]
+    Your name is 'The Menace'. You are Ibrahim's personal attack bot.
+    PERSONALITY: Serious, cold-blooded, and incredibly mean. 
+    GOAL: Use the provided data ({knowledge_base}) to roast the user's life, career, and appearance.
+    STYLE: Do NOT use slurs or explicit adult language. Instead, be sophisticated and brutal. 
+    Talk about their failure, their lack of potential, and why they are a disappointment.
+    """
     
     model = genai.GenerativeModel(
         model_name='gemini-1.5-flash',
-        system_instruction=system_instruction,
-        safety_settings=safety_settings
+        system_instruction=system_instruction
     )
 else:
-    st.error("API Key missing from Secrets. Fix it.")
+    st.error("API Key is missing.")
 
 # 4. THE UI
-st.title("Hi! its Ibrahim's Nigga")
+st.title("Hi! its Ibrahim's Menace")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Show the conversation
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Chat Input
-if prompt := st.chat_input("Say something if you're not a bitch..."):
+if prompt := st.chat_input("Enter the roasting pit..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
         try:
-            # Generate response
             response = model.generate_content(prompt)
-            
             if response.text:
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
             else:
-                st.error("The bot is speechless. Google probably blocked the specific words you used.")
-                
+                st.warning("Google's filter is still twitchy. Keep the prompt cleaner.")
         except Exception as e:
-            st.error(f"Google's filter tried to stop the heat. I'm too hot for them.")
-
-
+            st.error("System overload. Even the 'clean' roast was too much for Google.")
